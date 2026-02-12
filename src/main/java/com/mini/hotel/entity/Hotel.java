@@ -5,15 +5,16 @@ import lombok.Data;
 
 import java.util.List;
 
+@Data
 @Entity
-@Table(name = "Hotel")
+@Table(name = "hotel")
 public class Hotel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer hotelId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String hotelName;
 
     @Column(name = "address")
@@ -26,8 +27,8 @@ public class Hotel {
     @Column(name = "email", nullable = false)
     private String hotelEmail;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @Column(nullable = true)
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @Column(name = "branch", nullable = true)
     private List<String> branches;
 
 }

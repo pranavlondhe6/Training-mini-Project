@@ -1,18 +1,23 @@
 package com.mini.hotel.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
 
-@Data
 @Entity
+@Table(name = "branch")
 public class Branch {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int branchId;
+    private Long branchId;
 
+    @Column(name = "name",  nullable = false)
+    private String branchName;
+
+    @Column(name = "address")
+    private String branchAddress;
+
+    @ManyToOne
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
 
 }
