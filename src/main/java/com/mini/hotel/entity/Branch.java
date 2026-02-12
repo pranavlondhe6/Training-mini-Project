@@ -1,7 +1,9 @@
 package com.mini.hotel.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "branch")
 public class Branch {

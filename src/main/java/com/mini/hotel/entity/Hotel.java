@@ -29,6 +29,6 @@ public class Hotel {
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
     @Column(name = "branch", nullable = true)
-    private List<String> branches;
+    private List<Branch> branches;
 
 }
