@@ -23,12 +23,14 @@ public class Hotel {
     @Column(name = "phoneNumber")
     private String hotelPhone;
 
-
     @Column(name = "email", nullable = false)
     private String hotelEmail;
 
+//    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+//    @Column(name = "branch", nullable = true)
+//    private List<Branch> branches;
+
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
-    @Column(name = "branch", nullable = true)
     private List<Branch> branches;
 
 }
