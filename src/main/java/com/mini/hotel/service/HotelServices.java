@@ -7,6 +7,8 @@ import com.mini.hotel.model.BranchDTO;
 import com.mini.hotel.model.HotelDTO;
 import com.mini.hotel.repository.HotelRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +31,23 @@ public class HotelServices {
         hotel.setHotelPhone(dto.getHotelPhone());
         hotel.setHotelEmail(dto.getHotelEmail());
 
-        List<Branch> branches = dto.getBranches().stream().map(b -> {
+//        List<Branch> branches = dto.getBranches().stream().map(b -> {
+//            Branch branch = new Branch();
+//            branch.setBranchName(b.getBranchName());
+//            branch.setBranchAddress(b.getBranchAddress());
+//            branch.setHotel(hotel);
+//            return branch;
+//        }).collect(Collectors.toList());
+
+        List<Branch> branches = new ArrayList<>();
+
+        for (BranchDTO branchDTO : dto.getBranches()) {
             Branch branch = new Branch();
-            branch.setBranchName(b.getBranchName());
-            branch.setBranchAddress(b.getBranchAddress());
+            branch.setBranchName(branchDTO.getBranchName());
+            branch.setBranchAddress(branchDTO.getBranchAddress());
             branch.setHotel(hotel);
-            return branch;
-        }).collect(Collectors.toList());
+            branches.add(branch);
+        }
 
         hotel.setBranches(branches);
 
@@ -92,6 +104,11 @@ public class HotelServices {
         }
 
         return hotelDTOs;
+    }
+
+    public String updateHotel(RequestParam id, HotelDTO dto) {
+
+        return "Hotel updated successfully";
     }
 
 }
