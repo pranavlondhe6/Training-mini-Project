@@ -30,4 +30,9 @@ public class HotelController {
     public List<HotelDTO> getAllHotels() {
         return hotelService.getAllHotels();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateHotel(RequestParam id, @RequestBody HotelDTO dto) {
+        return new ResponseEntity<String>(hotelService.updateHotel(id, dto), HttpStatus.ACCEPTED);
+    }
 }
