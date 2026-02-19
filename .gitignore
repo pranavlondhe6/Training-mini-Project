@@ -19,6 +19,8 @@ Hotel Management System_ER_Diagram.png
 *.iml
 *.ipr
 
+ER_Hotel.png
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

@@ -1,5 +1,6 @@
 package com.mini.hotel.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ public class Hotel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "hotel_id")
     private Integer hotelId;
 
     @Column(name = "name", nullable = false)
@@ -26,11 +28,8 @@ public class Hotel {
     @Column(name = "email", nullable = false)
     private String hotelEmail;
 
-//    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
-//    @Column(name = "branch", nullable = true)
-//    private List<Branch> branches;
-
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Branch> branches;
 
 }
