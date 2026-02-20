@@ -42,7 +42,6 @@ public class GuestController {
     @Operation(summary = "Delete a guest by ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteGuest(@PathVariable Long id) {
-        guestService.deleteGuest(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(guestService.deleteGuest(id));
     }
 }
