@@ -6,7 +6,8 @@ import lombok.Data;
 public class BookingDTO {
 
     private Long id;
-    private String guest;
+    private Long guestId; // input: FK from guest dropdown
+    private String guest; // output: guest name for display
     private String room;
     private String checkin;
     private String checkout;

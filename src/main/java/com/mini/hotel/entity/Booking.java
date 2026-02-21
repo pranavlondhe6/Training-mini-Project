@@ -14,10 +14,10 @@ public class Booking {
     @Column(name = "booking_id")
     private Long bookingId;
 
-    @Column(name = "guest", nullable = false)
-    private String guest;
+    @ManyToOne
+    @JoinColumn(name = "guest_id", referencedColumnName = "guest_id", nullable = true)
+    private Guest guest;
 
-    // FK to room table
     @ManyToOne
     @JoinColumn(name = "room_id", referencedColumnName = "room_id", nullable = false)
     @JsonBackReference

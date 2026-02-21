@@ -1,9 +1,11 @@
 package com.mini.hotel.service;
 
 import com.mini.hotel.entity.Booking;
+import com.mini.hotel.entity.Guest;
 import com.mini.hotel.entity.Room;
 import com.mini.hotel.model.BookingDTO;
 import com.mini.hotel.repository.BookingRepository;
+import com.mini.hotel.repository.GuestRepository;
 import com.mini.hotel.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,17 +17,23 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final RoomRepository roomRepository;
+    private final GuestRepository guestRepository;
 
-    public BookingService(BookingRepository bookingRepository, RoomRepository roomRepository) {
+    public BookingService(BookingRepository bookingRepository,
+            RoomRepository roomRepository,
+            GuestRepository guestRepository) {
         this.bookingRepository = bookingRepository;
         this.roomRepository = roomRepository;
+        this.guestRepository = guestRepository;
     }
 
-    // Map entity → DTO (expose room number as string for frontend)
     private BookingDTO toDTO(Booking booking) {
         BookingDTO dto = new BookingDTO();
         dto.setId(booking.getBookingId());
-        dto.setGuest(booking.getGuest());
+        if (booking.getGuest() != null) {
+            dto.setGuestId(booking.getGuest().getGuestId());
+            dto.setGuest(booking.getGuest().getName());
+        }
         dto.setRoom(booking.getRoom().getRoomNumber());
         dto.setCheckin(booking.getCheckin());
         dto.setCheckout(booking.getCheckout());
@@ -47,8 +55,8 @@ public class BookingService {
 
     public BookingDTO addBooking(BookingDTO dto) {
 
-        if (dto.getGuest() == null || dto.getGuest().isBlank()) {
-            throw new RuntimeException("Guest name is required");
+        if (dto.getGuestId() == null) {
+            throw new RuntimeException("guestId is required");
         }
 
         if (dto.getRoom() == null || dto.getRoom().isBlank()) {
@@ -58,20 +66,19 @@ public class BookingService {
         if (dto.getCheckin() == null || dto.getCheckout() == null) {
             throw new RuntimeException("Check-in and check-out dates are required");
         }
-        
-        Room room = roomRepository.findByRoomNumber(dto.getRoom()).orElse(null);
 
-        if (room == null) {
-            throw new RuntimeException("Room '" + dto.getRoom() + "' does not exist");
-        }
+        Guest guest = guestRepository.findById(dto.getGuestId())
+                .orElseThrow(() -> new RuntimeException("Guest not found with id: " + dto.getGuestId()));
+
+        Room room = roomRepository.findByRoomNumber(dto.getRoom())
+                .orElseThrow(() -> new RuntimeException("Room '" + dto.getRoom() + "' does not exist"));
 
         if (Boolean.FALSE.equals(room.getAvailable())) {
             throw new RuntimeException("Room '" + dto.getRoom() + "' is already occupied");
         }
 
-        // Create booking
         Booking booking = new Booking();
-        booking.setGuest(dto.getGuest());
+        booking.setGuest(guest);
         booking.setRoom(room);
         booking.setCheckin(dto.getCheckin());
         booking.setCheckout(dto.getCheckout());
@@ -79,7 +86,6 @@ public class BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        // Mark room as unavailable
         room.setAvailable(false);
         roomRepository.save(room);
 
@@ -88,20 +94,20 @@ public class BookingService {
 
     public BookingDTO updateBooking(Long id, BookingDTO dto) {
 
-        Booking booking = bookingRepository.findById(id).orElse(null);
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
 
-        if (booking == null) {
-            throw new RuntimeException("Booking not found with id: " + id);
+        if (dto.getGuestId() != null) {
+            Guest guest = guestRepository.findById(dto.getGuestId())
+                    .orElseThrow(() -> new RuntimeException("Guest not found with id: " + dto.getGuestId()));
+            booking.setGuest(guest);
         }
 
-        //Agar room change krna hai in update
-        if (dto.getRoom() != null && !dto.getRoom().equals(booking.getRoom().getRoomNumber())) { // room number in booking is not same as room number is incoming DTO
+        // Agar room change krna hai in update
+        if (dto.getRoom() != null && !dto.getRoom().equals(booking.getRoom().getRoomNumber())) {
 
-            Room newRoom = roomRepository.findByRoomNumber(dto.getRoom()).orElse(null);
-
-            if (newRoom == null) {
-                throw new RuntimeException("Room '" + dto.getRoom() + "' does not exist");
-            }
+            Room newRoom = roomRepository.findByRoomNumber(dto.getRoom())
+                    .orElseThrow(() -> new RuntimeException("Room '" + dto.getRoom() + "' does not exist"));
 
             if (Boolean.FALSE.equals(newRoom.getAvailable())) {
                 throw new RuntimeException("Room '" + dto.getRoom() + "' is already occupied");
@@ -116,11 +122,10 @@ public class BookingService {
             roomRepository.save(newRoom);
         }
 
-        booking.setGuest(dto.getGuest());
         booking.setCheckin(dto.getCheckin());
         booking.setCheckout(dto.getCheckout());
 
-        // If booking is completed or cancelled → free the room
+        // If booking is completed or cancelled then room available = true karna padega
         String newStatus = dto.getStatus();
         if ("Completed".equalsIgnoreCase(newStatus) || "Cancelled".equalsIgnoreCase(newStatus)) {
             booking.getRoom().setAvailable(true);
@@ -135,13 +140,9 @@ public class BookingService {
 
     public String deleteBooking(Long id) {
 
-        Booking booking = bookingRepository.findById(id).orElse(null);
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
 
-        if (booking == null) {
-            throw new RuntimeException("Booking not found with id: " + id);
-        }
-
-        // Free the room when booking is deleted
         Room room = booking.getRoom();
         room.setAvailable(true);
         roomRepository.save(room);

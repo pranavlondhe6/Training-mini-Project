@@ -36,7 +36,7 @@ public class GuestService {
 
     public GuestDTO addGuest(GuestDTO dto) {
 
-        if(dto.getPhone().length() != 10){
+        if (dto.getPhone().length() != 10) {
             throw new RuntimeException("Enter Valid Phone Number");
         }
 
@@ -53,11 +53,8 @@ public class GuestService {
 
     public GuestDTO updateGuest(Long id, GuestDTO dto) {
 
-        Guest guest = guestRepository.findById(id).orElse(null);
-
-        if (guest == null) {
-            throw new RuntimeException("Guest not found");
-        }
+        Guest guest = guestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Guest not found with id: " + id));
 
         guest.setName(dto.getName());
         guest.setPhone(dto.getPhone());

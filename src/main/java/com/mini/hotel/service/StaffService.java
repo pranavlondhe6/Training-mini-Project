@@ -52,11 +52,8 @@ public class StaffService {
 
     public List<StaffDTO> updateStaff(Long id, StaffDTO dto) {
 
-        Staff staff = staffRepository.findById(id).orElse(null);
-
-        if (staff == null) {
-            throw new RuntimeException("Staff not found with id: " + id);
-        }
+        Staff staff = staffRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Staff not found with id: " + id));
 
         staff.setName(dto.getName());
         staff.setRole(dto.getRole());

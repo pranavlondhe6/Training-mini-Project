@@ -52,11 +52,8 @@ public class RoomService {
 
     public RoomDTO updateRoom(Long id, RoomDTO dto) {
 
-        Room room = roomRepository.findById(id).orElse(null);
-
-        if (room == null) {
-            throw new RuntimeException("Room not found");
-        }
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
 
         room.setRoomNumber(dto.getNumber());
         room.setRoomType(dto.getType());
